@@ -1,28 +1,30 @@
+require("express-async-errors");
+const database = require("./database/sqlite");
+const AppError = require("./utils/AppError");
 const express = require("express");
+const routes = require("./routes")
 
 const app = express();
 app.use(express.json()); //falando p requisição que o formato é json
 
-app.get("/message/:id/:user", (request, response) => {
-  const { id, user } = request.params;
-  response.send(`
-    Você digitou o ID: ${id}
-    e o usuário: ${user}
-  `);
-});
+app.use(routes)
 
-app.get("/users", (request, response) => {
-  const { page, limit } = request.query;
-  response.send(`
-  Página: ${page}
-  Mostrar: ${limit}
-  `);
-});
+database()
 
-app.post("/users", (request, response) => {
-  const { name, email, password } = request.body;
+app.use((error, request, response, next) => {
+  if (error instanceof AppError) {//erro do lado do cliente
+    return response.status(error.statusCode).json({
+      status: "error",
+      message: error.message
+    });
+  }
 
-  response.send(`${name}, ${email}, ${password}`);
+  console.error(error);
+
+  return response.status(500).json({
+    status: "error",
+    message: "Internal Server Error",
+  });
 });
 
 
