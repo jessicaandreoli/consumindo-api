@@ -15,6 +15,7 @@ const userController = new UsersController();
 
 //userRoutes.use(myMiddleware) // assim aplico o myMiddleware para todas as rotas de usuário
 userRoutes.post("/", userController.create);
+userRoutes.put("/:id", userController.update);
 
 /* userRoutes.get("/message/:id/:user", (request, response) => {
   const { id, user } = request.params;
